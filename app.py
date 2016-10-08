@@ -47,5 +47,6 @@ def setspeed():
 
 if __name__ == "__main__":
     app.debug = True
+    app.secret_key = "janky-relay-server"
     app.run('0.0.0.0', port=11235)
 
