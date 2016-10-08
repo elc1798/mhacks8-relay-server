@@ -10,12 +10,19 @@ def auth():
     Simple GET/POST authentication method. Send POST with JSON with 'auth-token'
     key to auth, send GET request to de-auth
     """
+    success = { 'status' : 'ok' }
+    authfail = { 'status' : 'invalid auth' }
     if request.method == "POST":
         data = jason(request.data)
         session['auth-token'] = data['auth-token']
         session['speed'] = 'UNSET'
+        return jsonify(**success)
     else:
-        session.clear()
+        if "auth-token" in session and session["auth-token"] == request.args.get("auth-token"):
+            session.clear()
+            return jsonify(**success)
+        else:
+            return jsonify(**authfail)
 
 @app.route("/speed/", methods=["GET", "POST"])
 def setspeed():
@@ -37,7 +44,7 @@ def setspeed():
             return jsonify(**errmsg)
     else:
         try:
-            if "auth-token" in session and session["auth-token"] == data["auth-token"]:
+            if "auth-token" in session and session["auth-token"] == request.args.get("auth-token"):
                 d = { 'status' : 'ok', 'speed' : session['speed'] }
                 return jsonify(**d)
             else:
